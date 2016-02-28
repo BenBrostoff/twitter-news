@@ -5,14 +5,22 @@ import (
   "github.com/dghubble/go-twitter/twitter"
   "github.com/dghubble/oauth1"
   "github.com/bradfitz/slice"
-  //"reflect"
 )
+
 
 type SelectedTweet struct {
   User string
   Text string
   CreatedAt string
   RetweetCount int
+}
+
+func getDefaultTweetNum() (string) {
+    defaultNum := os.Getenv("DEFAULT_TWEET_HISTORY")
+    if defaultNum == "" {
+      defaultNum = "25"
+    }
+    return defaultNum
 }
 
 func getClient() (*twitter.Client) {
@@ -23,10 +31,10 @@ func getClient() (*twitter.Client) {
   return twitter.NewClient(httpClient)
 }
 
- func getTweetsFromUser(user string) ([]SelectedTweet) {
+ func getTweetsFromUser(user string, tweetNum int) ([]SelectedTweet) {
   client := getClient()
   userTimelineParams := &twitter.UserTimelineParams{
-    ScreenName: user, Count: 25 /*IncludeRetweets: false*/}
+    ScreenName: user, Count: tweetNum /*IncludeRetweets: false*/}
   tweets, _, _ := client.Timelines.UserTimeline(userTimelineParams)
   selectedTweets := make([]SelectedTweet, 1)
 
@@ -43,10 +51,10 @@ func getClient() (*twitter.Client) {
   return selectedTweets
 }
 
-func getTweets() ([]SelectedTweet) {  
+func getTweets(tweetNum int) ([]SelectedTweet) {  
   tweets := []SelectedTweet{}
   for i := 0; i < len(users); i++ {
-    userTweets := getTweetsFromUser(users[i])
+    userTweets := getTweetsFromUser(users[i], tweetNum)
     tweets = append(tweets, userTweets...)
   }
   return tweets

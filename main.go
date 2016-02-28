@@ -2,13 +2,20 @@ package main
 
 import (
   "log"
+  "strconv"
   "encoding/json"
   "net/http"
   "github.com/gorilla/mux"
 )
 
-func Tweets(w http.ResponseWriter, r *http.Request) {
-  json.NewEncoder(w).Encode(getTweets())
+func Tweets(w http.ResponseWriter, r *http.Request) { 
+  tweetHistoryStr := r.FormValue("tweet_history")
+  tweetHistoryNum, _ := strconv.Atoi(tweetHistoryStr)
+  if tweetHistoryNum == 0 {
+    tweetHistoryNum, _ = strconv.Atoi(getDefaultTweetNum())
+  }
+
+  json.NewEncoder(w).Encode(getTweets(tweetHistoryNum))
 }
 
 func main() {
